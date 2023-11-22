@@ -10,6 +10,7 @@ void convertToUpperCase(char* str) {
     }
 }
 
+// Function to check if an account exists in the specified file
 int checkAccount(char* filename, int accNo, char* name) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -36,6 +37,7 @@ int checkAccount(char* filename, int accNo, char* name) {
     return 0;
 }
 
+// Function to authenticate an account based on account number and PIN
 int authenticateAccount(char* filename, int accNo, int pin, char* name) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -56,6 +58,7 @@ int authenticateAccount(char* filename, int accNo, int pin, char* name) {
     return 0;
 }
 
+// Function to withdraw money from an account
 void withdrawMoney(char* filename, int accNo, int pin, float amount) {
     float balance;
     int updatedBalance = 0;
@@ -110,6 +113,7 @@ void withdrawMoney(char* filename, int accNo, int pin, float amount) {
     }
 }
 
+// Function to display account balance
 void displayAccountBalance(char* filename, int accNo, char* name) {
     float balance;
 
@@ -138,116 +142,82 @@ void displayAccountBalance(char* filename, int accNo, char* name) {
 }
 
 void transferMoney(char* filename, int senderAccNo, int senderPin, int receiverAccNo, float amount) {
-    float senderBalance, receiverBalance;
-    int senderUpdatedBalance = 0;
-    int receiverUpdatedBalance = 0;
-    char senderName[50], receiverName[50];
-
-    // Update the balance of the sender's account
-    if (authenticateAccount(filename, senderAccNo, senderPin, senderName)) {
-        FILE* file = fopen(filename, "r+");
-        if (file == NULL) {
-            printf("Error opening file.\n");
-            return;
-        }
-
-        FILE* tempFile = fopen("temp.txt", "w");
-        if (tempFile == NULL) {
-            fclose(file);
-            printf("Error creating temporary file.\n");
-            return;
-        }
-
-        int fileAccNo, filePin;
-        while (fscanf(file, "%d,%d,%f,%49[^\n]\n", &fileAccNo, &filePin, &senderBalance, senderName) == 4) {
-            if (fileAccNo == senderAccNo) {
-                if (senderBalance >= amount) {
-                    senderBalance -= amount;
-                    senderUpdatedBalance = 1;
-                    printf("Transfer successful from %s's account. Remaining balance: %.2f\n", senderName, senderBalance);
-                } else {
-                    printf("Insufficient funds. Transfer failed.\n");
-                    fclose(file);
-                    fclose(tempFile);
-                    return;
-                }
-            }
-            fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePin, senderBalance, senderName);
-        }
-
-        fclose(file);
-
-        if (remove(filename) != 0) {
-            printf("Error deleting the original file.\n");
-            return;
-        }
-
-        if (rename("temp.txt", filename) != 0) {
-            printf("Error renaming the temporary file.\n");
-            return;
-        }
-
-        if (!senderUpdatedBalance) {
-            printf("Sender account not found.\n");
-            return;
-        }
-    } else {
-        printf("Invalid sender account number or PIN. Transfer failed.\n");
-        return;
-    }
-
-    // Check the receiver's account
-    if (!checkAccount(filename, receiverAccNo, receiverName)) {
-        printf("Receiver account not found.\n");
-        return;
-    }
-
-    // Update the balance of the receiver's account
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
     }
 
-    FILE* tempFile = fopen("temp.txt", "w");
-    if (tempFile == NULL) {
-        fclose(file);
-        printf("Error creating temporary file.\n");
-        return;
-    }
-
+    int senderFound = 0;
+    int receiverFound = 0;
     int fileAccNo, filePin;
-    while (fscanf(file, "%d,%d,%f,%49[^\n]\n", &fileAccNo, &filePin, &receiverBalance, receiverName) == 4) {
-        if (fileAccNo == receiverAccNo) {
-            receiverBalance += amount;
-            receiverUpdatedBalance = 1;
+    float senderBalance, receiverBalance;
+    char senderName[50], receiverName[50];
+
+    // Read the entire file into memory
+    struct Account {
+        int accNo;
+        int pin;
+        float balance;
+        char name[50];
+    };
+
+    struct Account accounts[100];  // Assuming a maximum of 100 accounts
+    int numAccounts = 0;
+
+    while (fscanf(file, "%d,%d,%f,%49[^\n]\n", &fileAccNo, &filePin, &accounts[numAccounts].balance, accounts[numAccounts].name) == 4) {
+        accounts[numAccounts].accNo = fileAccNo;
+        accounts[numAccounts].pin = filePin;
+
+        if (fileAccNo == senderAccNo) {
+            if (accounts[numAccounts].balance >= amount) {
+                accounts[numAccounts].balance -= amount;
+                senderFound = 1;
+                printf("Transfer successful from %s's account. Remaining balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
+            } else {
+                printf("Insufficient funds. Transfer failed.\n");
+                fclose(file);
+                return;
+            }
         }
-        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePin, receiverBalance, receiverName);
+
+        if (fileAccNo == receiverAccNo) {
+            accounts[numAccounts].balance += amount;
+            receiverFound = 1;
+            printf("Transfer successful to %s's account. Receiver's new balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
+        }
+
+        numAccounts++;
     }
 
     fclose(file);
-    fclose(tempFile);
 
-    if (remove(filename) != 0) {
-        printf("Error deleting the original file.\n");
+    // Check if sender and receiver accounts were found
+    if (!senderFound) {
+        printf("Sender account not found.\n");
         return;
     }
 
-    if (rename("temp.txt", filename) != 0) {
-        printf("Error renaming the temporary file.\n");
-        return;
-    }
-
-    if (!receiverUpdatedBalance) {
+    if (!receiverFound) {
         printf("Receiver account not found.\n");
         return;
     }
 
-    printf("Transfer successful to %s's account. Receiver's new balance: %.2f\n", receiverName, receiverBalance);
+    // Write the modified data back to the file
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file for writing.\n");
+        return;
+    }
+
+    for (int i = 0; i < numAccounts; i++) {
+        fprintf(file, "%d,%d,%.2f,%s\n", accounts[i].accNo, accounts[i].pin, accounts[i].balance, accounts[i].name);
+    }
+
+    fclose(file);
 }
 
-
-
+// Main function
 int main() {
     char filename[] = "account_details.txt";
 
