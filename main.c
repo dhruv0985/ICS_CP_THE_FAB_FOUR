@@ -83,7 +83,7 @@ void withdrawMoney(char* filename, int accNo, int pin, float amount) {
             if (fileAccNo == accNo) {
                 if (balance >= amount) {
                     balance -= amount;
-                    printf("Withdrawal successful. Remaining balance: %.2f\n", balance);
+                    printf("          Withdrawal successful.\n          Remaining balance: %.2f\n", balance);
                     updatedBalance = 1;
                 } else {
                     printf("Insufficient funds. Withdrawal failed.\n");
@@ -173,7 +173,7 @@ void transferMoney(char* filename, int senderAccNo, int senderPin, int receiverA
             if (accounts[numAccounts].balance >= amount) {
                 accounts[numAccounts].balance -= amount;
                 senderFound = 1;
-                printf("Transfer successful from %s's account. Remaining balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
+                printf("\n\n          Transfer successful from %s's account.\n          Remaining balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
             } else {
                 printf("Insufficient funds. Transfer failed.\n");
                 fclose(file);
@@ -184,7 +184,7 @@ void transferMoney(char* filename, int senderAccNo, int senderPin, int receiverA
         if (fileAccNo == receiverAccNo) {
             accounts[numAccounts].balance += amount;
             receiverFound = 1;
-            printf("Transfer successful to %s's account. Receiver's new balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
+            printf("\n          Transfer successful to %s's account.\n          Receiver's new balance: %.2f\n", accounts[numAccounts].name, accounts[numAccounts].balance);
         }
 
         numAccounts++;
@@ -224,27 +224,32 @@ int main() {
     int accNo, pin, option, receiverAccNo;
     float amount;
     char name[50];
+    
+    printf("\n");
 
-    printf("Enter your account number: ");
+    printf("         HELLO\n         WELCOME TO OUR BANK\n\n         Enter your account number: ");
     scanf("%d", &accNo);
 
     int foundAccount = checkAccount(filename, accNo, name);
     if (foundAccount) {
-        printf("Enter your PIN: ");
+        printf("\n");
+        printf("         Enter your PIN: ");
         scanf("%d", &pin);
 
         if (authenticateAccount(filename, accNo, pin, name)) {
             convertToUpperCase(name);
-            printf("HELLO %s\n", name);
+            printf("\n");
+            printf("          HELLO %s\n", name);
 
             do {
-                printf("\n1. Withdraw Money\n2. Balance Enquiry\n3. Transfer Money\n0. Exit\n");
-                printf("Choose an option: ");
+                printf("\n          1. Withdraw Money\n          2. Balance Enquiry\n          3. Transfer Money\n          0. Exit\n");
+                printf("\n          Choose an option: ");
                 scanf("%d", &option);
 
                 switch (option) {
                     case 1:
-                        printf("Enter the amount to withdraw: ");
+                        printf("\n");
+                        printf("          Enter the amount to withdraw: ");
                         scanf("%f", &amount);
                         withdrawMoney(filename, accNo, pin, amount);
                         break;
@@ -252,17 +257,20 @@ int main() {
                         displayAccountBalance(filename, accNo, name);
                         break;
                     case 3:
-                        printf("Enter the recipient's account number: ");
+                        printf("\n");
+                        printf("          Enter the recipient's account number: ");
                         scanf("%d", &receiverAccNo);
-                        printf("Enter the amount to transfer: ");
+                        printf("\n");
+                        printf("          Enter the amount to transfer: ");
                         scanf("%f", &amount);
                         transferMoney(filename, accNo, pin, receiverAccNo, amount);
                         break;
                     case 0:
-                        printf("Exiting...\n");
+                        printf("          Exiting...\n");
                         break;
                     default:
-                        printf("Invalid option. Please try again.\n");
+                        printf("\n");
+                        printf("          Invalid option. Please try again.\n");
                 }
             } while (option != 0);
         } else {
