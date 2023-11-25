@@ -194,12 +194,12 @@ void transferMoney(char* filename, int senderAccNo, int senderPin, int receiverA
 
     // Check if sender and receiver accounts were found
     if (!senderFound) {
-        printf("Sender account not found.\n");
+        printf("Sender account not found.\n\n");
         return;
     }
 
     if (!receiverFound) {
-        printf("Receiver account not found.\n");
+        printf("Receiver account not found.\n\n");
         return;
     }
 
@@ -217,17 +217,63 @@ void transferMoney(char* filename, int senderAccNo, int senderPin, int receiverA
     fclose(file);
 }
 
+void changePIN(char* filename, int accNo, int oldPIN, int newPIN) {
+    FILE* file = fopen(filename, "r+");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+
+    FILE* tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        fclose(file);
+        printf("Error creating temporary file.\n");
+        return;
+    }
+
+    int fileAccNo, filePIN;
+    float balance;
+    char name[50];
+    int updatedPIN = 0;
+
+    while (fscanf(file, "%d,%d,%f,%49[^\n]\n", &fileAccNo, &filePIN, &balance, name) == 4) {
+        if (fileAccNo == accNo && filePIN == oldPIN) {
+            fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, newPIN, balance, name);
+            printf("\n          PIN change successful.\n");
+            updatedPIN = 1;
+        } else {
+            fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePIN, balance, name);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (remove(filename) != 0) {
+        printf("Error deleting the original file.\n");
+        return;
+    }
+
+    if (rename("temp.txt", filename) != 0) {
+        printf("Error renaming the temporary file.\n");
+        return;
+    }
+
+    if (!updatedPIN) {
+        printf("Account not found or incorrect old PIN.\n");
+    }
+}
+
 // Main function
 int main() {
     char filename[] = "account_details.txt";
 
-    int accNo, pin, option, receiverAccNo;
+    int accNo, pin, option, receiverAccNo, newPIN;
     float amount;
     char name[50];
-    
-    printf("\n");
 
-    printf("         HELLO\n         WELCOME TO OUR BANK\n\n         Enter your account number: ");
+    printf("\n");
+    printf("         **HELLO SIR**\n         WELCOME TO OUR BANK\n\n         Enter your account number: ");
     scanf("%d", &accNo);
 
     int foundAccount = checkAccount(filename, accNo, name);
@@ -242,7 +288,7 @@ int main() {
             printf("          HELLO %s\n", name);
 
             do {
-                printf("\n          1. Withdraw Money\n          2. Balance Enquiry\n          3. Transfer Money\n          0. Exit\n");
+                printf("\n          1. Withdraw Money\n          2. Balance Enquiry\n          3. Transfer Money\n          4. Change PIN\n          0. Exit\n");
                 printf("\n          Choose an option: ");
                 scanf("%d", &option);
 
@@ -265,6 +311,14 @@ int main() {
                         scanf("%f", &amount);
                         transferMoney(filename, accNo, pin, receiverAccNo, amount);
                         break;
+                    case 4:
+                        printf("\n");
+                        printf("          Enter your old PIN: ");
+                        scanf("%d", &pin);
+                        printf("\n          Enter your new PIN: ");
+                        scanf("%d", &newPIN);
+                        changePIN(filename, accNo, pin, newPIN);
+                        break;
                     case 0:
                         printf("          Exiting...\n");
                         break;
@@ -274,10 +328,10 @@ int main() {
                 }
             } while (option != 0);
         } else {
-            printf("Invalid PIN.\n");
+            printf("\n          Invalid PIN.\n");
         }
     } else {
-        printf("Account not found.\n");
+        printf("\n           Account not found.\n");
     }
 
     return 0;
