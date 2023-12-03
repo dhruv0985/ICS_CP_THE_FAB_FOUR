@@ -7,7 +7,7 @@ TEAM MEMBER:-
 ENVIROMENT SETUP
 
 a) CODE DEPENDENCIES
-1.ACCOUNT DETAILS
+1.ACCOUNT DETAILS:- https://github.com/dhruv0985/ICS_CP_THE_FAB_FOUR/blob/77db3b91625b9a8d5c2a6c787f345d5952a9c836/account_details.txt
 
 EXECUTION GUIDELINES
 1. enter account no of 8 digits
