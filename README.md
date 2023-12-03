@@ -15,10 +15,7 @@ EXECUTION GUIDELINES
 3. then chosse option
 
 WORKING OF CODE
-1.
-
-int acccheck(char* filename, int acc_no) {
-FILE* file = fopen(filename, "r");
+1.This part check that our input accountno. and pin is present in code or not  
     
     int fileAccNo;
     while (fscanf(file, "%d,%*[^,\n],%*[^\n]", &fileAccNo) ==1) {
@@ -30,11 +27,7 @@ FILE* file = fopen(filename, "r");
     }
 
     fclose(file);
-    return 0;
-}
-    
-int pincheck(char* filename, int acc_no, int pin, char* name) {
-    FILE* file = fopen(filename, "r");
+    return 0; 
 
     int fileAccNo, filePin;
     float balance;
