@@ -15,8 +15,10 @@ EXECUTION GUIDELINES
 3. then chosse option
 
 WORKING OF CODE
-1. int acccheck(char* filename, int acc_no) {
-    FILE* file = fopen(filename, "r");
+1.
+
+int acccheck(char* filename, int acc_no) {
+FILE* file = fopen(filename, "r");
     
     int fileAccNo;
     while (fscanf(file, "%d,%*[^,\n],%*[^\n]", &fileAccNo) ==1) {
