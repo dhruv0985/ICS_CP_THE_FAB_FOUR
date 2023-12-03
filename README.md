@@ -16,6 +16,8 @@ EXECUTION GUIDELINES
 
 WORKING OF CODE
 
+We use simple name variable so it is easy to understand what that variable do and what function do in our code
+
 1.This part check that our input accountno. and pin is present in code or not  
     
     int fileAccNo;
