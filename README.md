@@ -135,4 +135,5 @@ This part transfer money from one account to other and also save history in anot
     }
 
     fclose(file);
-}
+
+Similarly withdrawmoney function ,depositmoney function ,transaction history are also coded.
