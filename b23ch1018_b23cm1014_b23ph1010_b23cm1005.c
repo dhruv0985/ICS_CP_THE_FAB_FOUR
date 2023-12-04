@@ -1,5 +1,3 @@
-//create a file name "account_details.txt" and save person account details in the sequence{account no,pin,amount,name}
-//remember don't give space between them
 #include <stdio.h>
 #include <stdlib.h>
 #include<string.h>
