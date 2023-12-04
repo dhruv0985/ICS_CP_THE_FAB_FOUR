@@ -13,9 +13,9 @@
 int acccheck(char* filename, int acc_no) {
     FILE* file = fopen(filename, "r");
 
-    int fileAccNo;
-    while (fscanf(file, "%d,%*[^\n]", &fileAccNo) ==1) {
-        if (fileAccNo == acc_no) {
+    int fileaccno;
+    while (fscanf(file, "%d,%*[^\n]", &fileaccno) ==1) {
+        if (fileaccno == acc_no) {
             fclose(file);
             return 1;
         }
@@ -28,10 +28,10 @@ int acccheck(char* filename, int acc_no) {
 int pincheck(char* filename, int acc_no, int pin, char* name) {
     FILE* file = fopen(filename, "r");
 
-    int fileAccNo, filePin;
+    int fileaccno, filePin;
     float balance;
-    while (fscanf(file, "%d,%d,%f,%[^\n]", &fileAccNo, &filePin,&balance,name) == 4) {
-        if (fileAccNo == acc_no && filePin == pin) {
+    while (fscanf(file, "%d,%d,%f,%[^\n]", &fileaccno, &filePin,&balance,name) == 4) {
+        if (fileaccno == acc_no && filePin == pin) {
             fclose(file);
             return 1;
         }
@@ -49,16 +49,16 @@ void withdrawmoney(char* filename, int acc_no, int pin, float amount) {
 
         FILE* tempFile = fopen("temp.txt", "w");
 
-        int fileAccNo, filePin;
-        while (fscanf(file, "%d,%d,%f,%[^\n]\n", &fileAccNo, &filePin, &balance, name) == 4) {
-            if (fileAccNo == acc_no) {
+        int fileaccno, filePin;
+        while (fscanf(file, "%d,%d,%f,%[^\n]\n", &fileaccno, &filePin, &balance, name) == 4) {
+            if (fileaccno == acc_no) {
                 if (balance >= amount) {
                     char s[] = ".txt";
-                    char tran_details[100];
-                    strcpy(tran_details, name);
-                    strcat(tran_details, s);
+                    char tdetail[100];
+                    strcpy(tdetail, name);
+                    strcat(tdetail, s);
 
-                    FILE* tranfile=fopen(tran_details,"a+");
+                    FILE* tranfile=fopen(tdetail,"a+");
                     fprintf(tranfile,"       #  %.2fRs get debited successfully\n          Available balance %.2f\n",amount,(balance-amount));
                     fclose(tranfile);
 
@@ -68,7 +68,7 @@ void withdrawmoney(char* filename, int acc_no, int pin, float amount) {
                     printf(yellow"Insufficient funds. Withdrawal failed.\n");
                 }
             }
-            fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePin, balance, name);
+            fprintf(tempFile, "%d,%d,%.2f,%s\n", fileaccno, filePin, balance, name);
         }
 
         fclose(file);
@@ -84,11 +84,11 @@ void printbalance(char* filename, int acc_no, char* name) {
     if (acccheck(filename, acc_no)==1) {
         FILE* file = fopen(filename, "r");
 
-        int fileAccNo, filePin;
-        while (fscanf(file, "%d,%d,%f,%[^\n]\n", &fileAccNo, &filePin, &balance, name) == 4) {
-            if (fileAccNo == acc_no) {
+        int fileaccno, filePin;
+        while (fscanf(file, "%d,%d,%f,%[^\n]\n", &fileaccno, &filePin, &balance, name) == 4) {
+            if (fileaccno == acc_no) {
                 printf(cyan"\n          Name: %s\n", name);
-                printf("\n          Account number: %d\n",fileAccNo);
+                printf("\n          Account number: %d\n",fileaccno);
                 printf("\n          Account balance: %.2f\n", balance);
                 fclose(file);
                 return;
@@ -106,28 +106,28 @@ FILE* file = fopen(filename, "r");
 FILE* tempFile = fopen("temp.txt", "w");
 
 int newpin;
-int fileAccNo, filePIN;
+int fileaccno, filePIN;
 float balance;
 char name[50];
 int updatedPIN = 0;
 
-while (fscanf(file, "%d,%d,%f,%[^\n]", &fileAccNo, &filePIN, &balance, name) == 4) {
-    if (fileAccNo == acc_no && filePIN == oldPIN) {
+while (fscanf(file, "%d,%d,%f,%[^\n]", &fileaccno, &filePIN, &balance, name) == 4) {
+    if (fileaccno == acc_no && filePIN == oldPIN) {
         printf(yellow"\n          Enter new pin :");
         printf("\033[1;31m");
         scanf("%d",&newpin);
-        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, newpin, balance, name);
+        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileaccno, newpin, balance, name);
         printf(reset"\n          ");
         printf(stripred" PIN change successful.");
         printf("\033[0m");
         printf("\n");
     }
-    else if (fileAccNo == acc_no && filePIN != oldPIN) {
+    else if (fileaccno == acc_no && filePIN != oldPIN) {
         printf(red"          WRONG PIN"reset);
-        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePIN, balance, name);
+        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileaccno, filePIN, balance, name);
     }
     else {
-        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePIN, balance, name);
+        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileaccno, filePIN, balance, name);
     }
 }
 
@@ -141,11 +141,11 @@ rename("temp.txt", filename);
 
 void Transaction(char* filename, int acc_no, char* name) {
 char s[] = ".txt";
-char tran_details[100];
-strcpy(tran_details, name);
-strcat(tran_details, s);
+char tdetail[100];
+strcpy(tdetail, name);
+strcat(tdetail, s);
 
-FILE* file = fopen(tran_details, "r");
+FILE* file = fopen(tdetail, "r");
 
 printf("\n\n");
 char ch;
@@ -162,22 +162,22 @@ void depositmoney(char* filename, int acc_no, float amount, char* name) {
     FILE* file = fopen(filename, "r");
     FILE* tempFile = fopen("temp.txt", "w");
 
-    int fileAccNo, filePin;
-    while (fscanf(file, "%d,%d,%f,%[^\n]", &fileAccNo, &filePin, &balance, name) == 4) {
-        if (fileAccNo == acc_no) {
+    int fileaccno, filePin;
+    while (fscanf(file, "%d,%d,%f,%[^\n]", &fileaccno, &filePin, &balance, name) == 4) {
+        if (fileaccno == acc_no) {
             balance = balance+amount;
             printf(reset "\n          Deposit successful.\n          Updated balance: %.2f\n", balance);
 
             char s[] = ".txt";
-            char tran_details[100];
-            strcpy(tran_details, name);
-            strcat(tran_details, s);
+            char tdetail[100];
+            strcpy(tdetail, name);
+            strcat(tdetail, s);
 
-            FILE* tranfile=fopen(tran_details,"a");
+            FILE* tranfile=fopen(tdetail,"a");
                     fprintf(tranfile,"       #  %.2fRs get credited successfully\n          Available balance %.2f\n",amount,balance);
                     fclose(tranfile);
         }
-        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileAccNo, filePin, balance, name);
+        fprintf(tempFile, "%d,%d,%.2f,%s\n", fileaccno, filePin, balance, name);
     }
 
     fclose(file);
@@ -191,7 +191,7 @@ void depositmoney(char* filename, int acc_no, float amount, char* name) {
 int main() {
 char filename[] = "account_details.txt";
 
-int acc_no, pin, option, receiverAccNo, newPIN;
+int acc_no, pin, option, receiveraccno, newpin;
 float amount;
 char name[50];
 
@@ -200,9 +200,9 @@ printf(bold cyan"                   *HELLO SIR*\n\n          WELCOME TO 'THE FAB
 printf(yellow"          Enter your account number: ");
 printf("\033[1;31m");
 scanf("%d", &acc_no);
-int foundAccount = acccheck(filename, acc_no);
+int foundaccount = acccheck(filename, acc_no);
 
-if (foundAccount==1) {
+if (foundaccount==1) {
     printf("\n");
     printf(yellow"          Enter your PIN: ");
     printf("\033[1;31m");
