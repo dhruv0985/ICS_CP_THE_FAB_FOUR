@@ -50,7 +50,7 @@ void withdrawmoney(char* filename, int acc_no, int pin, float amount) {
     char name[50];
 
     
-        FILE* file = fopen(filename, "r+");
+        FILE* file = fopen(filename, "r");
 
         FILE* tempFile = fopen("temp.txt", "w");
 
