@@ -1,10 +1,8 @@
-//create a file name "account_details.txt" and save person account details in the sequence{account no,pin,amount,name}
-//remember don't give space between them
 #include <stdio.h>
 #include <stdlib.h>
 #include<string.h>
-//these are code that give colour
-#define red     "\x1b[31m"//give red colour
+
+#define red     "\x1b[31m" //give red colour
 #define cyan   "\x1b[96m"//cyan
 #define yellow  "\x1b[93m"//yellow
 #define stripred    "\x1b[101m"//striped
@@ -101,95 +99,6 @@ void printbalance(char* filename, int acc_no, char* name) {
     }
 }
 
-void transfermoney(char* filename, int senderAccNo, int senderPin, int receiverAccNo) {
-    FILE* file = fopen(filename, "r");
-
-    int senderFound = 0;
-    int receiverFound = 0;
-    int sendernum;
-    int receivernum;
-
-    struct Account {
-        int acc_no;
-        int pin;
-        float balance;
-        char name[50];
-    };
-
-    struct Account accounts[100];
-    int numAccounts = 0;
-
-    while (fscanf(file, "%d,%d,%f,%[^\n]\n", &accounts[numAccounts].acc_no, &accounts[numAccounts].pin, &accounts[numAccounts].balance, accounts[numAccounts].name) == 4) {
-        if (accounts[numAccounts].acc_no == senderAccNo) {
-            senderFound = 1;
-            sendernum = numAccounts;
-        }
-
-        if (accounts[numAccounts].acc_no == receiverAccNo) {
-            receivernum = numAccounts;
-            printf(yellow"          This account belongs to ");
-            printf(cyan"%s\n\n", accounts[numAccounts].name);
-            receiverFound = 1;
-        }
-
-        numAccounts++;
-    }
-
-    if (receiverFound == 1 && senderFound == 1) {
-        float amount;
-
-        printf(yellow"          Enter the amount to transfer: ");
-        printf("\033[1;31m");
-        scanf("%f", &amount);
-
-        if (accounts[sendernum].balance >= amount) {
-
-            char newfile[] = ".txt";
-            char sender_details[100];
-            char receiver_details[100];
-
-            strcpy(sender_details, accounts[sendernum].name);
-            strcat(sender_details, newfile);
-
-            strcpy(receiver_details, accounts[receivernum].name);
-            strcat(receiver_details, newfile);
-
-            FILE *senderFile = fopen(sender_details, "a");
-            FILE *receiverFile = fopen(receiver_details, "a");
-
-            accounts[sendernum].balance -= amount;
-            accounts[receivernum].balance += amount;
-
-            printf(reset"\n\n          Transfer successful from %s's account.\n          Remaining balance: %.2f\n", accounts[sendernum].name, accounts[sendernum].balance);
-            printf("\n\n          Transfer successful to %s's account.\n", accounts[receivernum].name);
-            fprintf(senderFile, "       #  Transfer successful of amount : %.2fRs to account number : %d\n          Available balance : %.2f\n", amount, accounts[receivernum].acc_no, accounts[sendernum].balance);
-            fclose(senderFile);
-            fprintf(receiverFile, "       #  %.2fRs amount get credited from account number :%d\n          Updated balance is %.2f\n", amount, accounts[sendernum].acc_no, accounts[receivernum].balance);
-            fclose(receiverFile);
-        } else {
-            printf(yellow"          Insufficient funds. Transfer failed.\n");
-            fclose(file);
-            return;
-        }
-    }
-
-    fclose(file);
-
-
-    if (!receiverFound) {
-        printf(yellow"          Receiver account not found.\n\n");
-        return;
-    }
-
-    file = fopen(filename, "w");
-
-    for (int i = 0; i < numAccounts; i++) {
-        fprintf(file, "%d,%d,%.2f,%s\n", accounts[i].acc_no, accounts[i].pin, accounts[i].balance, accounts[i].name);
-    }
-
-    fclose(file);
-}
-
 
 void changePIN(char* filename, int acc_no, int oldPIN) {
 FILE* file = fopen(filename, "r");
@@ -202,7 +111,7 @@ float balance;
 char name[50];
 int updatedPIN = 0;
 
-while (fscanf(file, "%d,%d,%f,%49[^\n]\n", &fileAccNo, &filePIN, &balance, name) == 4) {
+while (fscanf(file, "%d,%d,%f,%[^\n]", &fileAccNo, &filePIN, &balance, name) == 4) {
     if (fileAccNo == acc_no && filePIN == oldPIN) {
         printf(yellow"\n          Enter new pin :");
         printf("\033[1;31m");
@@ -308,9 +217,9 @@ if (foundAccount==1) {
             printf(bold yellow"\n          1. View Account Details\n");
             printf("          2. Change Pin\n");
             printf("          3. Withdraw Money\n");
-            printf("          4. Transfer Money\n");
-            printf("          5. Mini Statement\n");
-            printf("          6. Deposit Money\n");
+            // printf("          4. Transfer Money\n");
+            printf("          4. Mini Statement\n");
+            printf("          5. Deposit Money\n");
             printf("          0. Exit\n");
 
             printf("\n          Choose an option: ");
@@ -335,18 +244,10 @@ if (foundAccount==1) {
                     withdrawmoney(filename, acc_no, pin, amount);
                 }
                 else if(option==4){
-                    printf("\n");
-                    printf(yellow"          Enter the recipient's account number: ");
-                    printf("\033[1;31m");
-                    scanf("%d", &receiverAccNo);
-                    printf("\n");
-                    transfermoney(filename, acc_no, pin, receiverAccNo);
-                }
-                else if(option==5){
 
                     Transaction(filename,acc_no,name);
                 }
-                else if(option==6){
+                else if(option==5){
                     printf(yellow"\n          Enter The Amount to Deposit :");
                     printf("\033[1;31m");
                     scanf("%f",&amount);
